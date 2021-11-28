@@ -39,7 +39,7 @@ internal abstract class WindowDriver : IDisposable
             Disposed.Invoke(this, new EventArgs());
     }
 
-    internal void OnWindowEventReceived(WindowEventArgs e)
+    internal virtual void OnWindowEventReceived(WindowEventArgs e)
     {
         if (WindowEventReceived != null)
             WindowEventReceived.Invoke(this, e);

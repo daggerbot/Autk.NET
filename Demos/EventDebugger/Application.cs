@@ -25,10 +25,6 @@ public class Application : Autk.Application
     private Application()
     {
         _mainWindow = new MainWindow();
-        _mainWindow.Disposed += (sender, e) => Console.WriteLine($"Disposed");
-        _mainWindow.Moved += (sender, e) => Console.WriteLine($"Moved: {e.Location.X}, {e.Location.Y}");
-        _mainWindow.Resized += (sender, e) => Console.WriteLine($"Resized: {e.Size.Width}, {e.Size.Height}");
-        _mainWindow.VisibilityChanged += (sender, e) => Console.WriteLine($"VisibilityChanged: {e.IsVisible}");
     }
 
     //==============================================================================

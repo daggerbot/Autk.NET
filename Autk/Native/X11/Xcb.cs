@@ -26,8 +26,39 @@ internal static partial class Xcb
     public const int XCB_CONN_CLOSED_INVALID_SCREEN = 6;
     public const int XCB_CONN_CLOSED_FDPASSING_FAILED = 7;
 
-    // Event opcodes
+    // Event masks
+    public const uint XCB_EVENT_MASK_NO_EVENT = 0;
+    public const uint XCB_EVENT_MASK_KEY_PRESS = 0x00000001;
+    public const uint XCB_EVENT_MASK_KEY_RELEASE = 0x00000002;
+    public const uint XCB_EVENT_MASK_BUTTON_PRESS = 0x00000004;
+    public const uint XCB_EVENT_MASK_BUTTON_RELEASE = 0x00000008;
+    public const uint XCB_EVENT_MASK_ENTER_WINDOW = 0x00000010;
+    public const uint XCB_EVENT_MASK_LEAVE_WINDOW = 0x00000020;
+    public const uint XCB_EVENT_MASK_POINTER_MOTION = 0x00000040;
+    public const uint XCB_EVENT_MASK_POINTER_MOTION_HINT = 0x00000080;
+    public const uint XCB_EVENT_MASK_BUTTON_1_MOTION = 0x00000100;
+    public const uint XCB_EVENT_MASK_BUTTON_2_MOTION = 0x00000200;
+    public const uint XCB_EVENT_MASK_BUTTON_3_MOTION = 0x00000400;
+    public const uint XCB_EVENT_MASK_BUTTON_4_MOTION = 0x00000800;
+    public const uint XCB_EVENT_MASK_BUTTON_5_MOTION = 0x00001000;
+    public const uint XCB_EVENT_MASK_BUTTON_MOTION = 0x00002000;
+    public const uint XCB_EVENT_MASK_KEYMAP_STATE = 0x00004000;
+    public const uint XCB_EVENT_MASK_EXPOSURE = 0x00008000;
+    public const uint XCB_EVENT_MASK_VISIBILITY_CHANGE = 0x00010000;
+    public const uint XCB_EVENT_MASK_STRUCTURE_NOTIFY = 0x00020000;
+    public const uint XCB_EVENT_MASK_RESIZE_REDIRECT = 0x00040000;
+    public const uint XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY = 0x00080000;
+    public const uint XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT = 0x00100000;
+    public const uint XCB_EVENT_MASK_FOCUS_CHANGE = 0x00200000;
+    public const uint XCB_EVENT_MASK_PROPERTY_CHANGE = 0x00400000;
+    public const uint XCB_EVENT_MASK_COLOR_MAP_CHANGE = 0x00800000;
+    public const uint XCB_EVENT_MASK_OWNER_GRAB_BUTTON = 0x01000000;
+
+    // Event types
     public const byte XCB_DESTROY_NOTIFY = 17;
+    public const byte XCB_UNMAP_NOTIFY = 18;
+    public const byte XCB_MAP_NOTIFY = 19;
+    public const byte XCB_CONFIGURE_NOTIFY = 22;
     public const byte XCB_CLIENT_MESSAGE = 33;
 
     // Predefined atoms
@@ -102,6 +133,32 @@ internal static partial class Xcb
     public const uint XCB_ATOM_WM_CLASS = 67;
     public const uint XCB_ATOM_WM_TRANSIENT_FOR = 68;
 
+    // Window configuration flags
+    public const ushort XCB_CONFIG_WINDOW_X = 0x0001;
+    public const ushort XCB_CONFIG_WINDOW_Y = 0x0002;
+    public const ushort XCB_CONFIG_WINDOW_WIDTH = 0x0004;
+    public const ushort XCB_CONFIG_WINDOW_HEIGHT = 0x0008;
+    public const ushort XCB_CONFIG_WINDOW_BORDER_WIDTH = 0x0010;
+    public const ushort XCB_CONFIG_WINDOW_SIBLING = 0x0020;
+    public const ushort XCB_CONFIG_WINDOW_STACK_MODE = 0x0040;
+
+    // Window creation flags
+    public const uint XCB_CW_BACK_PIXMAP = 0x0001;
+    public const uint XCB_CW_BACK_PIXEL = 0x0002;
+    public const uint XCB_CW_BORDER_PIXMAP = 0x0004;
+    public const uint XCB_CW_BORDER_PIXEL = 0x0008;
+    public const uint XCB_CW_BIT_GRAVITY = 0x0010;
+    public const uint XCB_CW_WIN_GRAVITY = 0x0020;
+    public const uint XCB_CW_BACKING_STORE = 0x0040;
+    public const uint XCB_CW_BACKING_PLANES = 0x0080;
+    public const uint XCB_CW_BACKING_PIXEL = 0x0100;
+    public const uint XCB_CW_OVERRIDE_REDIRECT = 0x0200;
+    public const uint XCB_CW_SAVE_UNDER = 0x0400;
+    public const uint XCB_CW_EVENT_MASK = 0x0800;
+    public const uint XCB_CW_DONT_PROPAGATE = 0x1000;
+    public const uint XCB_CW_COLORMAP = 0x2000;
+    public const uint XCB_CW_CURSOR = 0x4000;
+
     //==============================================================================
     // Types
     //==============================================================================
@@ -125,6 +182,24 @@ internal static partial class Xcb
         public uint window;
         public uint type;
         public xcb_client_message_data_t data;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct xcb_configure_notify_event_t
+    {
+        public byte response_type;
+        public byte pad0;
+        public ushort sequence;
+        public uint event_;
+        public uint window;
+        public uint above_sibling;
+        public short x;
+        public short y;
+        public ushort width;
+        public ushort height;
+        public ushort border_width;
+        public byte override_redirect;
+        public byte pad1;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -204,6 +279,19 @@ internal static partial class Xcb
         public uint atom;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct xcb_map_notify_event_t
+    {
+        public byte response_type;
+        public byte pad0;
+        public ushort sequence;
+        public uint event_;
+        public uint window;
+        public byte override_redirect;
+        public byte pad1;
+        public ushort pad2;
+    }
+
     public enum xcb_prop_mode_t
     {
         XCB_PROP_MODE_REPLACE,
@@ -263,6 +351,19 @@ internal static partial class Xcb
         public byte min_keycode;
         public byte max_keycode;
         public uint pad1;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct xcb_unmap_notify_event_t
+    {
+        public byte response_type;
+        public byte pad0;
+        public ushort sequence;
+        public uint event_;
+        public uint window;
+        public byte from_configure;
+        public byte pad1;
+        public ushort pad2;
     }
 
     public enum xcb_visual_class_t

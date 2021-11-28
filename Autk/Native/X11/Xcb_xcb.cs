@@ -32,7 +32,44 @@ internal static partial class Xcb
         uint type,
         byte format,
         uint dataLength,
-        IntPtr data);
+        [In]
+        [MarshalAs(UnmanagedType.LPArray)]
+        byte[]? data);
+
+    [DllImport(LibXcb)]
+    public static extern xcb_void_cookie_t xcb_change_property(
+        IntPtr connection,
+        byte mode,
+        uint window,
+        uint property,
+        uint type,
+        byte format,
+        uint dataLength,
+        [In]
+        [MarshalAs(UnmanagedType.LPArray)]
+        ushort[]? data);
+
+    [DllImport(LibXcb)]
+    public static extern xcb_void_cookie_t xcb_change_property(
+        IntPtr connection,
+        byte mode,
+        uint window,
+        uint property,
+        uint type,
+        byte format,
+        uint dataLength,
+        [In]
+        [MarshalAs(UnmanagedType.LPArray)]
+        uint[]? data);
+
+    [DllImport(LibXcb)]
+    public static extern xcb_void_cookie_t xcb_configure_window(
+        IntPtr connection,
+        uint window,
+        ushort valueMask,
+        [In]
+        [MarshalAs(UnmanagedType.LPArray)]
+        uint[] values);
 
     [DllImport(LibXcb)]
     public static extern int xcb_connection_has_error(
@@ -52,6 +89,7 @@ internal static partial class Xcb
         ushort class_,
         uint visual,
         uint valueMask,
+        [In]
         [MarshalAs(UnmanagedType.LPArray)]
         uint[]? values);
 

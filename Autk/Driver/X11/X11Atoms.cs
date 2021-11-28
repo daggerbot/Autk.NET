@@ -16,8 +16,11 @@ internal struct X11Atoms
 
 #pragma warning disable 0649
 
+    public uint _NET_WM_ICON_NAME;
+    public uint _NET_WM_NAME;
     public uint _NET_WM_WINDOW_TYPE;
     public uint _NET_WM_WINDOW_TYPE_NORMAL;
+    public uint UTF8_STRING;
     public uint WM_DELETE_WINDOW;
     public uint WM_PROTOCOLS;
 

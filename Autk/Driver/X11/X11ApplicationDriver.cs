@@ -41,6 +41,10 @@ internal class X11ApplicationDriver : ApplicationDriver
     private PosixPipeWriter _messagePipeWriter;
     private ConcurrentQueue<Action> _actionQueue = new ConcurrentQueue<Action>();
 
+    // True if we've ever received a configure event with the high bit (0x80) set.
+    // If we pay attention to this bit, we can weed out some redundant events.
+    private bool _syntheticConfigureEvents;
+
     //==============================================================================
     // Constructors
     //==============================================================================
@@ -178,6 +182,41 @@ internal class X11ApplicationDriver : ApplicationDriver
             case Xcb.XCB_CLIENT_MESSAGE:
                 return HandleClientMessage(Marshal.PtrToStructure<Xcb.xcb_client_message_event_t>(eventPtr));
 
+            case Xcb.XCB_CONFIGURE_NOTIFY:
+                {
+                    bool synthetic = (genericEvent.response_type & 0x80) != 0;
+                    var configureEvent = Marshal.PtrToStructure<Xcb.xcb_configure_notify_event_t>(eventPtr);
+                    var window = GetWindow(configureEvent.window);
+
+                    if (window != null)
+                    {
+                        if (synthetic)
+                            _syntheticConfigureEvents = true;
+
+                        var size = new Size(configureEvent.width, configureEvent.height);
+                        var location = new Point(configureEvent.x, configureEvent.y);
+
+                        if (size != window.Size)
+                        {
+                            window.OnWindowEventReceived(new WindowEventArgs
+                            {
+                                EventType = WindowEventType.Resize,
+                                Size = size,
+                            });
+                        }
+
+                        if (location != window.Location && synthetic == _syntheticConfigureEvents)
+                        {
+                            window.OnWindowEventReceived(new WindowEventArgs
+                            {
+                                EventType = WindowEventType.Move,
+                                Location = location,
+                            });
+                        }
+                    }
+                }
+                return true;
+
             case Xcb.XCB_DESTROY_NOTIFY:
                 {
                     var destroyEvent = Marshal.PtrToStructure<Xcb.xcb_destroy_notify_event_t>(eventPtr);
@@ -186,6 +225,26 @@ internal class X11ApplicationDriver : ApplicationDriver
 
                     if (window != null)
                         window.Expire();
+                }
+                return true;
+
+            case Xcb.XCB_MAP_NOTIFY:
+                {
+                    var mapEvent = Marshal.PtrToStructure<Xcb.xcb_map_notify_event_t>(eventPtr);
+                    var window = GetWindow(mapEvent.window);
+
+                    if (window != null)
+                        window.OnWindowEventReceived(new WindowEventArgs { EventType = WindowEventType.Show });
+                }
+                return true;
+
+            case Xcb.XCB_UNMAP_NOTIFY:
+                {
+                    var unmapEvent = Marshal.PtrToStructure<Xcb.xcb_unmap_notify_event_t>(eventPtr);
+                    var window = GetWindow(unmapEvent.window);
+
+                    if (window != null)
+                        window.OnWindowEventReceived(new WindowEventArgs { EventType = WindowEventType.Hide });
                 }
                 return true;
 
