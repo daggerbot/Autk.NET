@@ -9,6 +9,7 @@
 namespace Autk.Driver;
 
 using System;
+using System.Drawing;
 
 internal abstract class WindowDriver : IDisposable
 {
@@ -19,6 +20,12 @@ internal abstract class WindowDriver : IDisposable
     public abstract bool IsDisposed { get; }
 
     public abstract bool IsVisible { get; set; }
+
+    public abstract Point Location { get; set; }
+
+    public abstract Size Size { get; set; }
+
+    public abstract string? Title { get; set; }
 
     //==============================================================================
     // Methods
@@ -32,10 +39,10 @@ internal abstract class WindowDriver : IDisposable
             Disposed.Invoke(this, new EventArgs());
     }
 
-    internal void OnWindowEventReceived(WindowEventType eventType)
+    internal void OnWindowEventReceived(WindowEventArgs e)
     {
         if (WindowEventReceived != null)
-            WindowEventReceived.Invoke(this, new WindowEventArgs(eventType));
+            WindowEventReceived.Invoke(this, e);
     }
 
     private void SetAtomProperty(uint property, uint value)

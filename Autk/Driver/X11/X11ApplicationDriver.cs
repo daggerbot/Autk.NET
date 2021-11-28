@@ -161,7 +161,7 @@ internal class X11ApplicationDriver : ApplicationDriver
                 var window = GetWindow(clientMessage.window);
 
                 if (window != null)
-                    window.OnWindowEventReceived(WindowEventType.CloseRequested);
+                    window.OnWindowEventReceived(new WindowEventArgs { EventType = WindowEventType.CloseRequest });
             }
         }
 

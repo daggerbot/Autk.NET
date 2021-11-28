@@ -38,6 +38,23 @@ internal static partial class Winapi
     public const int GWL_HINSTANCE = -6;
     public const int GWL_WNDPROC = -4;
 
+    // SetWindowPos flags
+    public const uint SWP_NOSIZE = 0x0001;
+    public const uint SWP_NOMOVE = 0x0002;
+    public const uint SWP_NOZORDER = 0x0004;
+    public const uint SWP_NOREDRAW = 0x0008;
+    public const uint SWP_NOACTIVATE = 0x0010;
+    public const uint SWP_DRAWFRAME = 0x0020;
+    public const uint SWP_FRAMECHANGED = 0x0020;
+    public const uint SWP_SHOWWINDOW = 0x0040;
+    public const uint SWP_HIDEWINDOW = 0x0080;
+    public const uint SWP_NOCOPYBITS = 0x0100;
+    public const uint SWP_NOOWNERZORDER = 0x0200;
+    public const uint SWP_NOREPOSITION = 0x0200;
+    public const uint SWP_NOSENDCHANGING = 0x0400;
+    public const uint SWP_DEFERERASE = 0x2000;
+    public const uint SWP_ASYNCWINDOWPOS = 0x4000;
+
     // ShowWindow commands
     public const int SW_HIDE = 0;
     public const int SW_NORMAL = 1;
@@ -74,9 +91,12 @@ internal static partial class Winapi
 
     // Window message types
     public const uint WM_DESTROY = 0x0002;
+    public const uint WM_MOVE = 0x0003;
+    public const uint WM_SIZE = 0x0005;
     public const uint WM_CLOSE = 0x0010;
     public const uint WM_QUIT = 0x0012;
     public const uint WM_SHOWWINDOW = 0x0018;
+    public const uint WM_SIZING = 0x0214;
     public const uint WM_USER = 0x0400;
 
     // Window style flags
@@ -111,6 +131,50 @@ internal static partial class Winapi
         WS_POPUP | WS_BORDER | WS_SYSMENU;
     public const uint WS_TILEDWINDOW =
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+    //==============================================================================
+    // Methods
+    //==============================================================================
+
+    public static ushort HIWORD(int n)
+    {
+        return HIWORD(unchecked((uint)n));
+    }
+
+    public static ushort HIWORD(uint n)
+    {
+        return unchecked((ushort)(n >> 16));
+    }
+
+    public static ushort HIWORD(IntPtr n)
+    {
+        return HIWORD(unchecked((uint)n.ToInt64()));
+    }
+
+    public static ushort HIWORD(UIntPtr n)
+    {
+        return HIWORD(unchecked((uint)n.ToUInt64()));
+    }
+
+    public static ushort LOWORD(int n)
+    {
+        return LOWORD(unchecked((uint)n));
+    }
+
+    public static ushort LOWORD(uint n)
+    {
+        return unchecked((ushort)n);
+    }
+
+    public static ushort LOWORD(IntPtr n)
+    {
+        return LOWORD(unchecked((uint)n.ToInt64()));
+    }
+
+    public static ushort LOWORD(UIntPtr n)
+    {
+        return LOWORD(unchecked((uint)n.ToUInt64()));
+    }
 
     //==============================================================================
     // Types

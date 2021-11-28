@@ -66,6 +66,11 @@ internal static partial class Winapi
         ref MSG lpMsg);
 
     [DllImport(User32, SetLastError = true)]
+    public static extern bool GetClientRect(
+        IntPtr hWnd,
+        out RECT lpRect);
+
+    [DllImport(User32, SetLastError = true)]
     public static extern int GetMessageW(
         out MSG lpMsg,
         IntPtr hWnd,
@@ -76,6 +81,23 @@ internal static partial class Winapi
     public static extern int GetWindowLongW(
         IntPtr hWnd,
         int nIndex);
+
+    [DllImport(User32, SetLastError = true)]
+    public static extern bool GetWindowRect(
+        IntPtr hWnd,
+        out RECT lpRect);
+
+    [DllImport(User32, SetLastError = true)]
+    public static extern int GetWindowTextW(
+        IntPtr hWnd,
+        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]
+        [Out]
+        char[] lpString,
+        int nMaxCount);
+
+    [DllImport(User32, SetLastError = true)]
+    public static extern int GetWindowTextLengthW(
+        IntPtr hWnd);
 
     [DllImport(User32, SetLastError = true)]
     public static extern IntPtr LoadCursorW(
@@ -94,6 +116,22 @@ internal static partial class Winapi
     public static extern ushort RegisterClassExW(
         [In]
         ref WNDCLASSEXW wc);
+
+    [DllImport(User32, SetLastError = true)]
+    public static extern bool SetWindowPos(
+        IntPtr hWnd,
+        IntPtr hWndInsertAfter,
+        int X,
+        int Y,
+        int cx,
+        int cy,
+        uint uFlags);
+
+    [DllImport(User32, SetLastError = true)]
+    public static extern bool SetWindowTextW(
+        IntPtr hWnd,
+        [MarshalAs(UnmanagedType.LPWStr)]
+        string? lpString);
 
     [DllImport(User32)]
     public static extern bool ShowWindow(

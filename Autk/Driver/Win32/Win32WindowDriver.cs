@@ -21,6 +21,7 @@ internal class Win32WindowDriver : WindowDriver
     // Constants
     //==============================================================================
 
+    private const int MaxDimension = 0xFFFF;
     private const string WindowClassName = "AutkWindow";
 
     //==============================================================================
@@ -54,8 +55,8 @@ internal class Win32WindowDriver : WindowDriver
         {
             left = 0,
             top = 0,
-            right = Math.Clamp(size.Width, 1, 0xFFFF),
-            bottom = Math.Clamp(size.Height, 1, 0xFFFF),
+            right = Math.Clamp(size.Width, 1, MaxDimension),
+            bottom = Math.Clamp(size.Height, 1, MaxDimension),
         };
 
         if (!Winapi.AdjustWindowRectEx(ref rect, style, bMenu: false, exStyle))
@@ -113,6 +114,122 @@ internal class Win32WindowDriver : WindowDriver
         }
     }
 
+    public override Point Location
+    {
+        get
+        {
+            if (IsDisposed)
+                return Point.Empty;
+
+            if (!Winapi.GetWindowRect(_hwnd, out var rect))
+                throw new Win32Exception("GetWindowRect()", Marshal.GetLastWin32Error());
+
+            return new Point(rect.left, rect.top);
+        }
+
+        set
+        {
+            if (IsDisposed)
+                return;
+
+            if (!Winapi.SetWindowPos(
+                hWnd: _hwnd,
+                hWndInsertAfter: IntPtr.Zero,
+                X: value.X,
+                Y: value.Y,
+                cx: 0,
+                cy: 0,
+                uFlags: Winapi.SWP_NOSIZE | Winapi.SWP_NOZORDER))
+            {
+                throw new Win32Exception("SetWindowPos()", Marshal.GetLastWin32Error());
+            }
+        }
+    }
+
+    public override Size Size
+    {
+        get
+        {
+            if (IsDisposed)
+                return Size.Empty;
+
+            if (!Winapi.GetClientRect(_hwnd, out var rect))
+                throw new Win32Exception("GetClientRect()", Marshal.GetLastWin32Error());
+
+            return new Size(rect.right - rect.left, rect.bottom - rect.top);
+        }
+
+        set
+        {
+            if (IsDisposed)
+                return;
+
+            var rect = new Winapi.RECT
+            {
+                left = 0,
+                top = 0,
+                right = Math.Clamp(value.Width, 1, MaxDimension),
+                bottom = Math.Clamp(value.Height, 1, MaxDimension),
+            };
+
+            if (!Winapi.AdjustWindowRectEx(ref rect, GetWindowStyle(), bMenu: false, GetWindowExStyle()))
+                throw new Win32Exception("AdjustWindowRectEx()", Marshal.GetLastWin32Error());
+
+            if (!Winapi.SetWindowPos(
+                hWnd: _hwnd,
+                hWndInsertAfter: IntPtr.Zero,
+                X: 0,
+                Y: 0,
+                cx: rect.right - rect.left,
+                cy: rect.bottom - rect.top,
+                uFlags: Winapi.SWP_NOMOVE | Winapi.SWP_NOZORDER))
+            {
+                throw new Win32Exception("SetWindowPos()", Marshal.GetLastWin32Error());
+            }
+        }
+    }
+
+    public override string? Title
+    {
+        get
+        {
+            if (IsDisposed)
+                return null;
+
+            int length = Winapi.GetWindowTextLengthW(_hwnd);
+
+            if (length <= 0)
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+
+                if (errorCode != 0)
+                    throw new Win32Exception("GetWindowTextLengthW()", Marshal.GetLastWin32Error());
+            }
+
+            var buffer = new char[length + 1];
+            length = Winapi.GetWindowTextW(_hwnd, buffer, length + 1);
+
+            if (length <= 0)
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+
+                if (errorCode != 0)
+                    throw new Win32Exception("GetWindowTextW()", Marshal.GetLastWin32Error());
+            }
+
+            return new string(buffer, 0, length);
+        }
+
+        set
+        {
+            if (IsDisposed)
+                return;
+
+            if (!Winapi.SetWindowTextW(_hwnd, value))
+                throw new Win32Exception("SetWindowTextW()", Marshal.GetLastWin32Error());
+        }
+    }
+
     //==============================================================================
     // Methods
     //==============================================================================
@@ -144,6 +261,11 @@ internal class Win32WindowDriver : WindowDriver
     public static Win32WindowDriver? GetWindow(IntPtr hwnd)
     {
         return _windowMap.GetValueOrDefault(hwnd);
+    }
+
+    private uint GetWindowExStyle()
+    {
+        return unchecked((uint)GetWindowLong(Winapi.GWL_EXSTYLE));
     }
 
     private int GetWindowLong(int index)
@@ -189,22 +311,69 @@ internal class Win32WindowDriver : WindowDriver
 
     private static IntPtr WndProc(IntPtr hwnd, uint message, UIntPtr wparam, IntPtr lparam)
     {
+        Win32WindowDriver? window;
+
         switch (message)
         {
             case Winapi.WM_CLOSE:
-                {
-                    var window = GetWindow(hwnd);
-                    if (window != null)
-                        window.OnWindowEventReceived(WindowEventType.CloseRequested);
-                }
+                window = GetWindow(hwnd);
+
+                if (window != null)
+                    window.OnWindowEventReceived(new WindowEventArgs { EventType = WindowEventType.CloseRequest });
+
                 return IntPtr.Zero;
 
             case Winapi.WM_DESTROY:
+                window = GetWindow(hwnd);
+
+                if (window != null)
+                    window.Expire();
+
+                return IntPtr.Zero;
+
+            case Winapi.WM_MOVE:
+                window = GetWindow(hwnd);
+
+                if (window != null)
                 {
-                    var window = GetWindow(hwnd);
-                    if (window != null)
-                        window.Expire();
+                    window.OnWindowEventReceived(new WindowEventArgs
+                    {
+                        EventType = WindowEventType.Move,
+                        Location = new Point
+                        {
+                            X = unchecked((short)Winapi.LOWORD(lparam)),
+                            Y = unchecked((short)Winapi.HIWORD(lparam)),
+                        },
+                    });
                 }
+
+                return IntPtr.Zero;
+
+            case Winapi.WM_SHOWWINDOW:
+                window = GetWindow(hwnd);
+
+                if (window != null)
+                {
+                    if (wparam == UIntPtr.Zero)
+                        window.OnWindowEventReceived(new WindowEventArgs { EventType = WindowEventType.Hide });
+                    else
+                        window.OnWindowEventReceived(new WindowEventArgs { EventType = WindowEventType.Show });
+                }
+
+                return IntPtr.Zero;
+
+            case Winapi.WM_SIZE:
+                window = GetWindow(hwnd);
+
+                if (window != null)
+                {
+                    window.OnWindowEventReceived(new WindowEventArgs
+                    {
+                        EventType = WindowEventType.Resize,
+                        Size = new Size(Winapi.LOWORD(lparam), Winapi.HIWORD(lparam)),
+                    });
+                }
+
                 return IntPtr.Zero;
 
             default:

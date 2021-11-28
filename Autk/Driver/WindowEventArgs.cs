@@ -9,21 +9,17 @@
 namespace Autk.Driver;
 
 using System;
+using System.Drawing;
 
 internal class WindowEventArgs : EventArgs
 {
-    //==============================================================================
-    // Constructors
-    //==============================================================================
-
-    public WindowEventArgs(WindowEventType eventType)
-    {
-        EventType = eventType;
-    }
-
     //==============================================================================
     // Properties
     //==============================================================================
 
     public WindowEventType EventType { get; init; }
+
+    public Point? Location { get; init; }
+
+    public Size? Size { get; init; }
 }

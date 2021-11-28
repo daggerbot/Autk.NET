@@ -11,5 +11,9 @@ namespace Autk.Driver;
 internal enum WindowEventType
 {
     None,
-    CloseRequested,
+    CloseRequest,
+    Hide,
+    Move,
+    Resize,
+    Show,
 }

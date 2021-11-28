@@ -55,6 +55,24 @@ public class Window : IDisposable
         set => _driver.IsVisible = value;
     }
 
+    public Point Location
+    {
+        get => _driver.Location;
+        set => _driver.Location = value;
+    }
+
+    public Size Size
+    {
+        get => _driver.Size;
+        set => _driver.Size = value;
+    }
+
+    public string? Title
+    {
+        get => _driver.Title;
+        set => _driver.Title = value;
+    }
+
     //==============================================================================
     // Methods
     //==============================================================================
@@ -73,6 +91,24 @@ public class Window : IDisposable
     {
         if (Disposed != null)
             Disposed.Invoke(this, new EventArgs());
+    }
+
+    internal void OnMoved(Point location)
+    {
+        if (Moved != null)
+            Moved.Invoke(this, new MoveEventArgs { Location = location });
+    }
+
+    internal void OnResized(Size size)
+    {
+        if (Resized != null)
+            Resized.Invoke(this, new ResizeEventArgs { Size = size });
+    }
+
+    internal void OnVisibilityChanged(bool visible)
+    {
+        if (VisibilityChanged != null)
+            VisibilityChanged.Invoke(this, new VisibilityEventArgs { IsVisible = visible });
     }
 
     internal void ThrowIfDisposed()
@@ -101,8 +137,24 @@ public class Window : IDisposable
     {
         switch (e.EventType)
         {
-            case WindowEventType.CloseRequested:
+            case WindowEventType.CloseRequest:
                 CloseRequested();
+                break;
+
+            case WindowEventType.Hide:
+                OnVisibilityChanged(false);
+                break;
+
+            case WindowEventType.Move:
+                OnMoved(e.Location!.Value);
+                break;
+
+            case WindowEventType.Resize:
+                OnResized(e.Size!.Value);
+                break;
+
+            case WindowEventType.Show:
+                OnVisibilityChanged(true);
                 break;
 
             default:
@@ -115,4 +167,29 @@ public class Window : IDisposable
     //==============================================================================
 
     public event EventHandler<EventArgs>? Disposed;
+
+    public event EventHandler<MoveEventArgs>? Moved;
+
+    public event EventHandler<ResizeEventArgs>? Resized;
+
+    public event EventHandler<VisibilityEventArgs>? VisibilityChanged;
+
+    //==============================================================================
+    // Types
+    //==============================================================================
+
+    public class MoveEventArgs : EventArgs
+    {
+        public Point Location { get; init; }
+    }
+
+    public class ResizeEventArgs : EventArgs
+    {
+        public Size Size { get; init; }
+    }
+
+    public class VisibilityEventArgs : EventArgs
+    {
+        public bool IsVisible { get; init; }
+    }
 }

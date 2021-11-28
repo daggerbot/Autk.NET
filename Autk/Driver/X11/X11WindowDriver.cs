@@ -89,6 +89,24 @@ internal class X11WindowDriver : WindowDriver
         }
     }
 
+    public override Point Location
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
+    public override Size Size
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
+    public override string? Title
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
     public IntPtr XcbConnectionPointer => _xcb;
 
     public uint Xid => _xid;
