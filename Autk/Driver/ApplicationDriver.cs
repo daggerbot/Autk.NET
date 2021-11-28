@@ -43,7 +43,9 @@ internal abstract class ApplicationDriver : IDisposable
                 if (_defaultInstance != null)
                     return _defaultInstance;
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    _defaultInstance = Win32.Win32ApplicationDriver.GetInstance();
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
                     || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
                 {
                     _defaultInstance = new X11.X11ApplicationDriver();

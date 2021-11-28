@@ -10,13 +10,13 @@ namespace Autk.Native;
 
 using System;
 
-public class NativeException : Exception
+public class NativeRuntimeException : Exception
 {
     //==============================================================================
     // Constructors
     //==============================================================================
 
-    internal NativeException(string message, Exception? innerException = null)
+    internal NativeRuntimeException(string message, Exception? innerException = null)
         : base(message, innerException)
     {
     }

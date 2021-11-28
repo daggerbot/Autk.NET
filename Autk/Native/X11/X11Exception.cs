@@ -10,7 +10,7 @@ namespace Autk.Native.X11;
 
 using System;
 
-public class X11Exception : NativeException
+public class X11Exception : NativeRuntimeException
 {
     //==============================================================================
     // Constructors
