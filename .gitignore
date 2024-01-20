@@ -1,0 +1,7 @@
+# Ignore dotfiles unless otherwise specified
+.*
+!/.gitignore
+
+# Ignore .NET build artifacts
+bin/
+obj/

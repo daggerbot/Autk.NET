@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autk", "Autk\Autk.csproj", "{002A58D7-F08E-4854-A57F-4FB2F8DE6DAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{6D1713B7-8E9F-409D-83DB-9E7F7BB2D82B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventDebugger", "Demos\EventDebugger\EventDebugger.csproj", "{165ACADE-01B7-4BDC-BCEC-6B42D824F615}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{002A58D7-F08E-4854-A57F-4FB2F8DE6DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{002A58D7-F08E-4854-A57F-4FB2F8DE6DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{002A58D7-F08E-4854-A57F-4FB2F8DE6DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{002A58D7-F08E-4854-A57F-4FB2F8DE6DAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{165ACADE-01B7-4BDC-BCEC-6B42D824F615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{165ACADE-01B7-4BDC-BCEC-6B42D824F615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{165ACADE-01B7-4BDC-BCEC-6B42D824F615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{165ACADE-01B7-4BDC-BCEC-6B42D824F615}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{165ACADE-01B7-4BDC-BCEC-6B42D824F615} = {6D1713B7-8E9F-409D-83DB-9E7F7BB2D82B}
+	EndGlobalSection
+EndGlobal
