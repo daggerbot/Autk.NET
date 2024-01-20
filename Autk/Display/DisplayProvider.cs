@@ -50,6 +50,8 @@ internal abstract class DisplayProvider : IDisposable
         return _default;
     }
 
+    public abstract void InvokeLater(Action action);
+
     internal void OnDisposed()
     {
         Disposed?.Invoke(this, EventArgs.Empty);

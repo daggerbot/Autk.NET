@@ -240,6 +240,11 @@ internal class X11DisplayProvider : DisplayProvider, IFileDescriptor
         }
     }
 
+    public override void InvokeLater(Action action)
+    {
+        _messageQueue.PostAction(action);
+    }
+
     public override void PostQuitMessage()
     {
         _messageQueue.PostQuitMessage();

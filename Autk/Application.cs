@@ -67,6 +67,13 @@ public class Application : IDisposable
     {
     }
 
+    public static void InvokeLater(Action action)
+    {
+        var displayProvider = DisplayProvider.GetPlatformDefault();
+        displayProvider.ThrowIfDisposed();
+        displayProvider.InvokeLater(action);
+    }
+
     protected virtual void LastWindowDisposed()
     {
         Quit();
